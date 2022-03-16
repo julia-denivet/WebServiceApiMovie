@@ -46,6 +46,8 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
+
+
         collect([
             [
                 'name' => 'Captain America',
@@ -80,9 +82,21 @@ class DatabaseSeeder extends Seeder
                 'name' => $movie["name"],
                 'description' => $movie["description"],
                 'note' => $movie["note"],
-                'category_id' => $index + 1,
                 'created_at' => Carbon::now(),
             ]);
+
+            $usedcategory = [];
+            for ($i = 0; $i <= 2; $i++) {
+                $category = rand(1, 5);
+                if (!in_array($category, $usedcategory)) {
+                    $pivotLine = DB::table('category_movie')->insertGetId([
+                        'movie_id' => $id,
+                        'category_id' => $category,
+                        'created_at' => Carbon::now(),
+                    ]);
+                    $usedcategory[] = $category;
+                }
+            }
         });
     }
 }

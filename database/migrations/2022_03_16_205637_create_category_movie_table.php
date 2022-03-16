@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Movie;
+use App\Models\Category;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -13,12 +15,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('movies', function (Blueprint $table) {
+        Schema::create('category_movie', function (Blueprint $table) {
             $table->id();
-            $table->string("name", 180);
-            $table->string("description", 2048);
-            $table->integer("note");
             $table->timestamps();
+            $table->foreignIdFor(Category::class);
+            $table->foreignIdFor(Movie::class);
         });
     }
 
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('movies');
+        Schema::dropIfExists('category_movie');
     }
 };

@@ -7,6 +7,12 @@ use App\Models\Movie;
 use Illuminate\Http\Request;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 
+/**
+ * @group Movies
+ *
+ * APIs for managing movies
+ */
+
 class MovieController extends Controller
 {
     /**
@@ -16,7 +22,7 @@ class MovieController extends Controller
      */
     public function index()
     {
-        $movie = Movie::with("category")->paginate(1);
+        $movie = Movie::with("categories")->paginate(1);
         return $movie;
 
         if ($movie->count() > 0) {
@@ -28,19 +34,36 @@ class MovieController extends Controller
 
     public function search()
     {
+
         $params = request()->query();
-        //dd($params);
-        if (isset($params["titre"]) || isset($params["description"])) {
-            return Movie::where('name', 'LIKE', "%{$params['titre']}%")->orWhere('description', 'LIKE', "%{$params['description']}%")->paginate(2);
-        }
+
+        $movie = Movie::query();
+        $movie->when(
+            isset($params["name"]),
+            function ($q) {
+                return $q->orWhere('name', 'LIKE',  "%" . request()->query('name') . "%");
+            }
+        );
+        $movie->when(
+            isset($params["description"]),
+            function ($q) {
+                return $q->orWhere('description', 'LIKE',  "%" . request()->query('description') . "%");
+            }
+        );
+
+        return $movie->get();
     }
 
+
     /**
-     * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+     * @bodyParam name string required Example: Toy Story
+     * @bodyParam description string required Example: L'infini et l'au delà
+     * @bodyParam date date required Example: 10/02/2022
+     * @bodyParam note smallInt required Example: 4
+     *
+     * 
+     **/
     public function store(Request $request)
     {
         $request->validate([
@@ -77,6 +100,15 @@ class MovieController extends Controller
      * @param  \App\Models\Movie  $movie
      * @return \Illuminate\Http\Response
      */
+    /**
+     *
+     * @bodyParam name string required Example: Toy Story
+     * @bodyParam description string required Example: L'infini et l'au delà
+     * @bodyParam date date required Example: 10/02/2022
+     * @bodyParam note smallInt required Example: 4
+     *
+     * 
+     **/
     public function update(Request $request, Movie $movie)
     {
         $request->validate([
