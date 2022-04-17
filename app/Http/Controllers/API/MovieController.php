@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\iSLoggedIn;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 
 /**
@@ -15,6 +17,13 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 
 class MovieController extends Controller
 {
+
+
+    public function __construct()
+    {
+        $this->middleware(iSLoggedIn::class, ['only' => ['index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,6 +31,8 @@ class MovieController extends Controller
      */
     public function index()
     {
+
+
         $movie = Movie::with("categories")->paginate(1);
         return $movie;
 
